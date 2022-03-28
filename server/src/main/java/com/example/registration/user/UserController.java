@@ -2,13 +2,18 @@ package com.example.registration.user;
 
 import org.apache.commons.lang3.StringUtils;
 import com.example.registration.user.dto.UserRegisterDTO;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.net.http.HttpResponse;
+
 import java.time.LocalDateTime;
+
+
+
+
 @CrossOrigin(origins = "*")
 @RestController
 public class UserController {
@@ -20,17 +25,18 @@ public class UserController {
     }
 
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/register")
-    public void create(@RequestBody UserRegisterDTO user) {
+
+    @PostMapping(value="/register")
+    public ResponseEntity create(@RequestBody UserRegisterDTO user) {;
         if (service.getByUsername(user.getUsername()) != null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This username is already registered on our site.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This username is already registered on our site.");
         } else if (!checkUsername(user.getUsername())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "The login does not meet the criteria.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("resp: The login does not meet the criteria.");
         } else if (!checkPassword(user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Password does not meet the criteria.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Password does not meet the criteria.");
         } else {
             addUserToDatabase(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body("User with username: " + user.getUsername() + "created successfully");
         }
     }
 
