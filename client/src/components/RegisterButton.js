@@ -1,6 +1,5 @@
 import * as React from "react";
 import Button from "@mui/material/Button";
-import {createTheme} from "@mui/material/styles";
 
 
 export default function RegisterButton() {

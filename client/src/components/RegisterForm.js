@@ -4,6 +4,8 @@ import { Form, Container } from "react-bootstrap";
 import RegisterButton from "./RegisterButton";
 import { Col, Row } from "react-bootstrap";
 import { Typography } from "@mui/material";
+import { responsiveProperty } from "@mui/material/styles/cssUtils";
+import Dialog from "./Dialog";
 
 export default function RegisterForm() {
   const [enteredLogin, setEnteredLogin] = useState("");
@@ -67,7 +69,7 @@ export default function RegisterForm() {
 
   const submitHandler = () => {
     if (formIsValid) {
-      const fetchTest = fetch("http://localhost:8080/api/users", {
+      fetch("http://localhost:8080/api/register", {
         method: "POST",
         body: JSON.stringify({
           username: enteredLogin,
@@ -79,12 +81,14 @@ export default function RegisterForm() {
       }).then((res) => {
         if (res.ok) {
           console.log(res);
-          // navigate("/");
+          navigate("/");
         } else {
-          return res.json().then((data) => {
-            // show an error modal
-            console.log(data);
-          });
+          <Dialog isSuccess={false} name={enteredLogin}/>;
+          console.log(res.status);
+          //   return res.json().then((data) => {
+          //   // show an error modal
+          //   console.log(data);
+          // });
         }
       });
     } else {
@@ -113,7 +117,7 @@ export default function RegisterForm() {
     }
 
     if (
-      enteredPassword === enteredRepeatedPassword &&
+      enteredPassword == enteredRepeatedPassword &&
       enteredRepeatedPasswordIsValid &&
       enteredPasswordIsValid
     ) {
@@ -140,12 +144,35 @@ export default function RegisterForm() {
         </Typography>
       </Row>
       <Row>
-        <Col xs={6}>
-          <Typography variant="h3" marginTop="30%">
-            Register
+        <Col>
+          <Typography variant="h5" marginTop={5}>
+            To register the new user successfully your credentials should meet
+            criteria like that:
+          </Typography>
+          <Typography variant="body1" marginTop={4} paragraph={true}>
+            The username field accepts alpha-numeric values only.
+          </Typography>
+          <Typography variant="body1" paragraph={true}>
+            The username length is no less than 5 characters.
+          </Typography>
+          <Typography variant="body1" paragraph={true}>
+            The username is not already registered.
+          </Typography>
+          <Typography variant="body1" paragraph={true}>
+            The password has a minimum length of 8 characters and contains at
+            least 1 number, 1 uppercase, and 1 lowercase character.
+          </Typography>
+
+          <Typography variant="h5" paragraph={true}>
+            Terms of registration:
+          </Typography>
+          <Typography variant="body1" paragraph={true}>
+            Your username and password which will be encrypted will be stored in
+            the database related to this site. Be aware about your sensitive
+            data.
           </Typography>
         </Col>
-        <Col xs={6}>
+        <Col>
           <div className="formBackground">
             <Form className="formWidth" onSubmit={formSubmissionHandler}>
               <Form.Group className="mb-3" controlId="formBasicNickName">
@@ -197,6 +224,11 @@ export default function RegisterForm() {
             </Form>
           </div>
         </Col>
+      </Row>
+      <Row>
+        <Typography variant="body2" marginTop={20} marginBottom={5}>
+          Copyright: Damian Trybuszek
+        </Typography>
       </Row>
     </Container>
   );
