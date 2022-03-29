@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Container } from "react-bootstrap";
 import RegisterButton from "./RegisterButton";
 import { Col, Row } from "react-bootstrap";
 import { Typography } from "@mui/material";
 import { responsiveProperty } from "@mui/material/styles/cssUtils";
-import Dialog from "./Dialog";
+import AlertDialog from "./AlertDialog";
 
 export default function RegisterForm() {
   const [enteredLogin, setEnteredLogin] = useState("");
@@ -17,6 +17,8 @@ export default function RegisterForm() {
   const [enteredPasswordIsValid, setEnteredPasswordIsValid] = useState(false);
   const [enteredRepeatedPasswordIsValid, setEnteredRepeatedPasswordIsValid] =
     useState(false);
+
+    const [showDialog, setShowDialog] = useState(false);
 
   let navigate = useNavigate();
   let formIsValid = false;
@@ -83,16 +85,13 @@ export default function RegisterForm() {
           console.log(res);
           navigate("/");
         } else {
-          <Dialog isSuccess={false} name={enteredLogin}/>;
+          setShowDialog(true)
           console.log(res.status);
-          //   return res.json().then((data) => {
-          //   // show an error modal
-          //   console.log(data);
-          // });
         }
       });
     } else {
       console.log("error");
+      
     }
   };
 
@@ -230,6 +229,10 @@ export default function RegisterForm() {
           Copyright: Damian Trybuszek
         </Typography>
       </Row>
+
+  {showDialog && <AlertDialog isSuccess={true} name={enteredLogin} setShowDialog/> }
+      
     </Container>
+    
   );
 }

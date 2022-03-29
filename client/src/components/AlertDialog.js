@@ -9,14 +9,19 @@ import DialogTitle from "@mui/material/DialogTitle";
 export default function AlertDialog(props) {
   const [open, setOpen] = React.useState(true);
 
-
   const handleClose = () => {
     setOpen(false);
   };
 
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+{props.showDialog ? setOpen(true) : setOpen(false)}
+
   return (
     <div>
-
       <Dialog
         open={open}
         onClose={handleClose}
@@ -27,18 +32,17 @@ export default function AlertDialog(props) {
           {"Registration Status"}
         </DialogTitle>
         <DialogContent>
-          if (props.isSuccess)
-          {
+          {props.isSuccess && (
             <DialogContentText id="alert-dialog-description">
               User with username: {props.name} has been created.
             </DialogContentText>
-          }
-          else
+          )}
+{/*           
           {
             <DialogContentText id="alert-dialog-description">
               Your Credentials does not meet criteria.
             </DialogContentText>
-          }
+          } */}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} autoFocus>
