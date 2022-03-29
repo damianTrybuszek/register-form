@@ -1,14 +1,11 @@
-import { Component } from "react";
+import React from "react";
 import RegisterForm from "../components/RegisterForm";
 
-class RegisterPage extends Component {
-  render() {
+const RegisterPage = () =>  {
     return (
-      <div>
         <RegisterForm />
-      </div>
     );
-  }
+
 }
 
 export default RegisterPage;

@@ -1,75 +1,74 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Container } from "react-bootstrap";
-import RegisterButton from "./RegisterButton";
 import { Col, Row } from "react-bootstrap";
 import { Typography } from "@mui/material";
-import { responsiveProperty } from "@mui/material/styles/cssUtils";
 import AlertDialog from "./AlertDialog";
+import Button from "@mui/material/Button";
 
-export default function RegisterForm() {
+const RegisterForm = () => {
+  let navigate = useNavigate();
+
   const [enteredLogin, setEnteredLogin] = useState("");
   const [enteredPassword, setEnteredPassword] = useState("");
   const [enteredRepeatedPassword, setEnteredRepeatedPassword] = useState("");
   const [areTermsAccepted, setTermsAccepted] = useState(false);
-
   const [enteredLoginIsValid, setEnteredLoginIsValid] = useState(false);
   const [enteredPasswordIsValid, setEnteredPasswordIsValid] = useState(false);
-  const [enteredRepeatedPasswordIsValid, setEnteredRepeatedPasswordIsValid] =
-    useState(false);
-
-    const [showDialog, setShowDialog] = useState(false);
-
-  let navigate = useNavigate();
-  let formIsValid = false;
-  let isPasswordMatching = false;
+  const [enteredRepeatedPasswordIsValid, setEnteredRepeatedPasswordIsValid] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [formIsValid, setFormIsValid] = useState(false);
+  const [isPasswordMatching, setIsPasswordMatching] = useState(false);
 
   const enteredLoginChangeHandler = (event) => {
     setEnteredLogin(event.target.value);
-
-    if (enteredLogin.trim() !== "") {
-      setEnteredLoginIsValid(true);
-      return;
-    }
+    setEnteredLoginIsValid(enteredLogin.trim() !== "");
   };
 
   const enteredPasswordChangeHandler = (event) => {
     setEnteredPassword(event.target.value);
-
-    if (enteredPassword.trim() !== "") {
-      setEnteredPasswordIsValid(true);
-      return;
-    }
+    setEnteredPasswordIsValid(enteredPassword.trim() !== "");
   };
 
   const enteredPasswordRepeatedChangeHandler = (event) => {
     setEnteredRepeatedPassword(event.target.value);
-
-    if (enteredRepeatedPassword.trim() !== "") {
-      setEnteredRepeatedPasswordIsValid(true);
-      return;
-    }
-  };
+    setEnteredRepeatedPasswordIsValid(enteredRepeatedPassword.trim() !== "");
+  }
 
   const loginInputBlurHandler = (event) => {
-    if (event.target.value.trim() === "") {
-      setEnteredLoginIsValid(false);
-    }
+    setEnteredLoginIsValid(event.target.value.trim() !== "");
   };
 
   const passwordInputBlurHandler = (event) => {
-    if (event.target.value.trim() === "") {
-      setEnteredPasswordIsValid(false);
-    }
-  };
+    setEnteredPasswordIsValid(event.target.value.trim() !== "");
+  }
 
   const passwordRepeatedInputBlurHandler = (event) => {
-    if (event.target.value.trim() === "") {
-      setEnteredRepeatedPasswordIsValid(false);
-    }
+    setEnteredRepeatedPasswordIsValid(event.target.value.trim() !== "" && enteredRepeatedPassword === enteredPassword);
+
   };
 
-  const submitHandler = () => {
+  const termsChangeHandler = (event) => {
+    setTermsAccepted(event.target.checked);
+  };
+
+  const checkInputs = () => {
+    setEnteredLoginIsValid(enteredLogin.trim() !== "");
+    setEnteredPasswordIsValid(enteredPassword.trim() !== "");
+    setIsPasswordMatching(enteredPassword === enteredRepeatedPassword && enteredRepeatedPasswordIsValid && enteredPasswordIsValid);
+    setFormIsValid(enteredLoginIsValid && isPasswordMatching);
+  }
+
+  const clearInputs = () => {
+      setEnteredLogin("");
+      setEnteredPassword("");
+      setEnteredRepeatedPassword("");
+  }
+
+  const formSubmissionHandler = (event) => {
+    event.preventDefault(); //to prevent sending HTTP request instantly, page would be reloaded
+    checkInputs()
+
     if (formIsValid) {
       fetch("http://localhost:8080/api/register", {
         method: "POST",
@@ -82,57 +81,13 @@ export default function RegisterForm() {
         },
       }).then((res) => {
         if (res.ok) {
-          console.log(res);
           navigate("/");
-        } else {
-          setShowDialog(true)
-          console.log(res.status);
         }
       });
-    } else {
-      console.log("error");
-      
     }
-  };
-
-  const termsChangeHandler = () => {
-    setTermsAccepted(!areTermsAccepted);
-    console.log(areTermsAccepted);
-  };
-
-  const formSubmissionHandler = (event) => {
-    event.preventDefault(); //to prevent sending HTTP request instantly, page would be reloaded
-
-    if (enteredLogin.trim() === "") {
-      setEnteredLoginIsValid(false);
-      return;
-    }
-
-    setEnteredLoginIsValid(true);
-
-    if (enteredPassword === "") {
-      setEnteredPasswordIsValid(false);
-      return;
-    }
-
-    if (
-      enteredPassword == enteredRepeatedPassword &&
-      enteredRepeatedPasswordIsValid &&
-      enteredPasswordIsValid
-    ) {
-      isPasswordMatching = true;
-    }
-
-    if (enteredLoginIsValid && isPasswordMatching) {
-      formIsValid = true;
-      submitHandler();
-    } else {
-      console.log("error");
-    }
-
-    setEnteredLogin("");
-    setEnteredPassword("");
-    setEnteredRepeatedPassword("");
+    setShowDialog(true);
+    // TODO: Upewnij się, że na pewno chcesz czyścić inputy po wprowadzeniu błędnych danych. UXowo to może być wkurwiające
+    clearInputs();
   };
 
   return (
@@ -219,7 +174,8 @@ export default function RegisterForm() {
                   value={areTermsAccepted}
                 />
               </Form.Group>
-              <RegisterButton />
+              <Button variant="contained" type="submit" style={{width:'100%', background: "#6aa84f",
+                textColor: "#ffffff"}}>Register</Button>
             </Form>
           </div>
         </Col>
@@ -230,9 +186,13 @@ export default function RegisterForm() {
         </Typography>
       </Row>
 
-  {showDialog && <AlertDialog isSuccess={true} name={enteredLogin} setShowDialog/> }
-      
+    {showDialog &&
+        <AlertDialog name={enteredLogin} showDialog={showDialog} setShowDialog={setShowDialog}/>
+    }
+
     </Container>
-    
+
   );
 }
+
+export default RegisterForm;
