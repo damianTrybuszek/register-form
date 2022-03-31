@@ -1,76 +1,81 @@
-import React, { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import { Form, Container } from "react-bootstrap";
-import RegisterButton from "./RegisterButton";
 import { Col, Row } from "react-bootstrap";
 import { Typography } from "@mui/material";
-import { responsiveProperty } from "@mui/material/styles/cssUtils";
 import AlertDialog from "./AlertDialog";
+import Button from "@mui/material/Button";
 
-export default function RegisterForm() {
+const RegisterForm = () => {
   const [enteredLogin, setEnteredLogin] = useState("");
   const [enteredPassword, setEnteredPassword] = useState("");
   const [enteredRepeatedPassword, setEnteredRepeatedPassword] = useState("");
-  const [areTermsAccepted, setTermsAccepted] = useState(false);
-
   const [enteredLoginIsValid, setEnteredLoginIsValid] = useState(false);
   const [enteredPasswordIsValid, setEnteredPasswordIsValid] = useState(false);
   const [enteredRepeatedPasswordIsValid, setEnteredRepeatedPasswordIsValid] =
     useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-    const [showDialog, setShowDialog] = useState(false);
-
-  let navigate = useNavigate();
-  let formIsValid = false;
-  let isPasswordMatching = false;
+  const [formIsValid, setFormIsValid] = useState(false);
+  const [isPasswordMatching, setIsPasswordMatching] = useState(false);
+  const [name, setName] = useState("");
 
   const enteredLoginChangeHandler = (event) => {
     setEnteredLogin(event.target.value);
-
-    if (enteredLogin.trim() !== "") {
-      setEnteredLoginIsValid(true);
-      return;
-    }
+    setEnteredLoginIsValid(enteredLogin.trim() !== "");
   };
 
   const enteredPasswordChangeHandler = (event) => {
     setEnteredPassword(event.target.value);
-
-    if (enteredPassword.trim() !== "") {
-      setEnteredPasswordIsValid(true);
-      return;
-    }
+    setEnteredPasswordIsValid(enteredPassword.trim() !== "");
   };
 
   const enteredPasswordRepeatedChangeHandler = (event) => {
     setEnteredRepeatedPassword(event.target.value);
-
-    if (enteredRepeatedPassword.trim() !== "") {
-      setEnteredRepeatedPasswordIsValid(true);
-      return;
-    }
+    setEnteredRepeatedPasswordIsValid(enteredRepeatedPassword.trim() !== "");
   };
 
   const loginInputBlurHandler = (event) => {
-    if (event.target.value.trim() === "") {
-      setEnteredLoginIsValid(false);
-    }
+    setEnteredLoginIsValid(event.target.value.trim() !== "");
   };
 
   const passwordInputBlurHandler = (event) => {
-    if (event.target.value.trim() === "") {
-      setEnteredPasswordIsValid(false);
-    }
+    setEnteredPasswordIsValid(event.target.value.trim() !== "");
   };
 
   const passwordRepeatedInputBlurHandler = (event) => {
-    if (event.target.value.trim() === "") {
-      setEnteredRepeatedPasswordIsValid(false);
-    }
+    setEnteredRepeatedPasswordIsValid(
+      event.target.value.trim() !== "" &&
+        enteredRepeatedPassword === enteredPassword
+    );
   };
 
-  const submitHandler = () => {
+
+
+  const checkInputs = () => {
+    setEnteredLoginIsValid(enteredLogin.trim() !== "");
+    setEnteredPasswordIsValid(enteredPassword.trim() !== "");
+    setIsPasswordMatching(
+      enteredPassword === enteredRepeatedPassword &&
+        enteredRepeatedPasswordIsValid &&
+        enteredPasswordIsValid
+    );
+    setFormIsValid(enteredLoginIsValid && isPasswordMatching);
+  };
+
+  const clearInputs = () => {
+    setEnteredLogin("");
+    setEnteredPassword("");
+    setEnteredRepeatedPassword("");
+  };
+
+  const formSubmissionHandler = (event) => {
+    event.preventDefault(); //to prevent sending HTTP request instantly, page would be reloaded
+    checkInputs();
+
     if (formIsValid) {
+      console.log(enteredLogin)
+      console.log(enteredPassword)
       fetch("http://localhost:8080/api/register", {
         method: "POST",
         body: JSON.stringify({
@@ -82,57 +87,15 @@ export default function RegisterForm() {
         },
       }).then((res) => {
         if (res.ok) {
-          console.log(res);
-          navigate("/");
+          setIsSuccess(true);
+          setName(enteredLogin);
         } else {
-          setShowDialog(true)
-          console.log(res.status);
+          setIsSuccess(false);
         }
       });
-    } else {
-      console.log("error");
-      
     }
-  };
-
-  const termsChangeHandler = () => {
-    setTermsAccepted(!areTermsAccepted);
-    console.log(areTermsAccepted);
-  };
-
-  const formSubmissionHandler = (event) => {
-    event.preventDefault(); //to prevent sending HTTP request instantly, page would be reloaded
-
-    if (enteredLogin.trim() === "") {
-      setEnteredLoginIsValid(false);
-      return;
-    }
-
-    setEnteredLoginIsValid(true);
-
-    if (enteredPassword === "") {
-      setEnteredPasswordIsValid(false);
-      return;
-    }
-
-    if (
-      enteredPassword == enteredRepeatedPassword &&
-      enteredRepeatedPasswordIsValid &&
-      enteredPasswordIsValid
-    ) {
-      isPasswordMatching = true;
-    }
-
-    if (enteredLoginIsValid && isPasswordMatching) {
-      formIsValid = true;
-      submitHandler();
-    } else {
-      console.log("error");
-    }
-
-    setEnteredLogin("");
-    setEnteredPassword("");
-    setEnteredRepeatedPassword("");
+    setShowDialog(true);
+    clearInputs();
   };
 
   return (
@@ -160,15 +123,6 @@ export default function RegisterForm() {
           <Typography variant="body1" paragraph={true}>
             The password has a minimum length of 8 characters and contains at
             least 1 number, 1 uppercase, and 1 lowercase character.
-          </Typography>
-
-          <Typography variant="h5" paragraph={true}>
-            Terms of registration:
-          </Typography>
-          <Typography variant="body1" paragraph={true}>
-            Your username and password which will be encrypted will be stored in
-            the database related to this site. Be aware about your sensitive
-            data.
           </Typography>
         </Col>
         <Col>
@@ -211,15 +165,17 @@ export default function RegisterForm() {
                   value={enteredRepeatedPassword}
                 />
               </Form.Group>
-              <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                <Form.Check
-                  type="checkbox"
-                  label="I accept the terms of registration."
-                  onChange={termsChangeHandler}
-                  value={areTermsAccepted}
-                />
-              </Form.Group>
-              <RegisterButton />
+              <Button
+                variant="contained"
+                type="submit"
+                style={{
+                  width: "100%",
+                  background: "#6aa84f",
+                  textColor: "#ffffff",
+                }}
+              >
+                Register
+              </Button>
             </Form>
           </div>
         </Col>
@@ -230,9 +186,16 @@ export default function RegisterForm() {
         </Typography>
       </Row>
 
-  {showDialog && <AlertDialog isSuccess={true} name={enteredLogin} setShowDialog/> }
-      
+      {showDialog && (
+        <AlertDialog
+          name={name}
+          showDialog={showDialog}
+          setShowDialog={setShowDialog}
+          isSuccess={isSuccess}
+        />
+      )}
     </Container>
-    
   );
-}
+};
+
+export default RegisterForm;

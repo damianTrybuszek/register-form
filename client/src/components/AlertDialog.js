@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -6,24 +6,15 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-export default function AlertDialog(props) {
-  const [open, setOpen] = React.useState(true);
-
+const AlertDialog = (props) => {
   const handleClose = () => {
-    setOpen(false);
+    props.setShowDialog(false);
   };
-
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-{props.showDialog ? setOpen(true) : setOpen(false)}
 
   return (
-    <div>
+    <>
       <Dialog
-        open={open}
+        open={props.setShowDialog}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
@@ -37,12 +28,12 @@ export default function AlertDialog(props) {
               User with username: {props.name} has been created.
             </DialogContentText>
           )}
-{/*           
-          {
+
+          {props.isSuccess == false && (
             <DialogContentText id="alert-dialog-description">
               Your Credentials does not meet criteria.
             </DialogContentText>
-          } */}
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} autoFocus>
@@ -50,6 +41,8 @@ export default function AlertDialog(props) {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
-}
+};
+
+export default AlertDialog;
