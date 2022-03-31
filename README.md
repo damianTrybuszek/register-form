@@ -3,7 +3,7 @@
 Instruction:
 
 
-To launch the project ypu need to have Node.js and npm installed.
+To launch the project you need to have Node.js and npm installed.
 
 You can download Node.js from the link: https://nodejs.org/en/.
 Nmp will be installed with this package.
@@ -21,7 +21,6 @@ After clicking "RegisterPage" you will see the register form.
 
 You can go directly to the form by typing http://localhost:3000/register.
 
-Server application is connected with Postgres database server placed in the cloud. 
 
 You can also see the code on github:
 
