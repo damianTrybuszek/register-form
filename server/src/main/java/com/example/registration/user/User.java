@@ -1,4 +1,5 @@
 package com.example.registration.user;
+
 import lombok.*;
 
 import javax.persistence.*;

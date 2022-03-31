@@ -2,7 +2,6 @@ package com.example.registration.user;
 
 import org.apache.commons.lang3.StringUtils;
 import com.example.registration.user.dto.UserRegisterDTO;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.time.LocalDateTime;
-
-
+import java.util.Locale;
 
 
 @CrossOrigin(origins = "*")
@@ -25,13 +23,12 @@ public class UserController {
     }
 
 
-
-    @PostMapping(value="/register")
-    public ResponseEntity create(@RequestBody UserRegisterDTO user) {;
-        if (service.getByUsername(user.getUsername()) != null) {
+    @PostMapping(value = "/register")
+    public ResponseEntity create(@RequestBody UserRegisterDTO user) {
+        if (service.getByUsername(user.getUsername().toLowerCase(Locale.ROOT)) != null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This username is already registered on our site.");
         } else if (!checkUsername(user.getUsername())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("resp: The login does not meet the criteria.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("The login does not meet the criteria.");
         } else if (!checkPassword(user.getPassword())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Password does not meet the criteria.");
         } else {
@@ -61,7 +58,6 @@ public class UserController {
         }
         return (upperCaseNumbers > 0 && lowerCaseNumbers > 0 && numberNumbers > 0 && password.length() >= 8);
     }
-
 
 
     private void addUserToDatabase(UserRegisterDTO user) {

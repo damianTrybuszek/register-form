@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -18,11 +17,11 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User getByUsername(String username){
-        return  this.repository.findByUsername(username);
+    public User getByUsername(String username) {
+        return this.repository.findByUsername(username);
     }
 
-    public void create(UserRegisterDTO user){
+    public void create(UserRegisterDTO user) {
         user.setUsername(user.getUsername().toLowerCase());
         String encodedPassword = this.passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);

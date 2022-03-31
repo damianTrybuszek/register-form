@@ -23,13 +23,6 @@ public class UserRegisterDTO {
                 .registeredTime(this.registeredTime)
                 .build();
     }
-
-    public static UserRegisterDTO of(User user) {
-        return UserRegisterDTO.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .registeredTime(user.getRegisteredTime())
-                .build();
-    }
+    
 
 }
